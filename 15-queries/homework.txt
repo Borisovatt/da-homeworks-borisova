@@ -1,26 +1,151 @@
 Задача 1
-#Вместо этой строки сюда писать запрос - ответ на задачу 1
+SELECT 
+  orderNumber, productCode, 
+  quantityOrdered*priceEach AS Revenue 
+FROM 
+  orderdetails
+ORDER BY 
+  Revenue DESC
+LIMIT 10
 
 
 Задача 2
-#Вместо этой строки сюда писать запрос - ответ на задачу 2
+SELECT
+   orderNumber,
+    SUM(quantityOrdered*priceEach) AS total
+FROM
+    orderdetails
+GROUP BY
+     orderNumber
+HAVING
+    SUM(quantityOrdered*priceEach) > 59000
 
 
 Задача 3
-#Вместо этой строки сюда писать запрос - ответ на задачу 3
+SELECT
+    o.orderNumber,
+    o.orderDate,
+    o.status,
+    total
+FROM
+    (
+        SELECT
+            orderNumber,
+            SUM(quantityOrdered * priceEach) AS total
+        FROM
+            orderdetails
+        GROUP BY
+            orderNumber
+        HAVING
+            SUM(quantityOrdered * priceEach) > 59000
+    ) AS expensive_orders
+INNER JOIN
+    orders o ON expensive_orders.orderNumber = o.orderNumber
 
 
 Задача 4
-#Вместо этой строки сюда писать запрос - ответ на задачу 4
+SELECT
+    c.contactFirstName,
+    c.contactLastName,
+    c.country,
+    o.orderNumber,
+    o.orderDate,
+    o.status,
+    expensive_orders.total_order_cost
+FROM
+    (
+        SELECT
+            orderNumber,
+            SUM(quantityOrdered * priceEach) AS total_order_cost
+        FROM
+            orderdetails
+        GROUP BY
+            orderNumber
+        HAVING
+            SUM(quantityOrdered * priceEach) > 59000
+    ) AS expensive_orders
+INNER JOIN
+    orders o ON expensive_orders.orderNumber = o.orderNumber
+INNER JOIN
+    customers c ON o.customerNumber = c.customerNumber
 
 
 Задача 5
-#Вместо этой строки сюда писать запрос - ответ на задачу 5
+SELECT
+    p.productName,
+    SUM(od.quantityOrdered * od.priceEach) AS total
+FROM
+    orderdetails od
+JOIN
+    products p ON od.productCode = p.productCode
+GROUP BY
+    od.productCode
+ORDER BY
+    total DESC
+LIMIT 10;
 
 
 Задача 6
-#Вместо этой строки сюда писать запрос - ответ на задачу 6
+SELECT
+    firstName,
+    lastName,
+    NULL AS contactFirstName,
+    NULL AS contactLastName
+FROM
+    employees
+WHERE
+    NOT EXISTS (
+        SELECT
+            1
+        FROM
+            customers
+    )
+UNION ALL
+SELECT
+    NULL AS firstName,
+    NULL AS lastName,
+    contactFirstName,
+    contactLastName
+FROM
+    customers
+WHERE
+    NOT EXISTS (
+        SELECT
+            1
+        FROM
+            employees
+    )
+UNION ALL
+SELECT
+    e.firstName,
+    e.lastName,
+    c.contactFirstName,
+    c.contactLastName
+FROM
+    employees e
+LEFT JOIN
+    customers c ON 1 = 1
+UNION ALL
+SELECT
+    e.firstName,
+    e.lastName,
+    c.contactFirstName,
+    c.contactLastName
+FROM
+    customers c
+LEFT JOIN
+    employees e ON 1 = 0;
 
 
 Задача 7
-#Вместо этой строки сюда писать запрос - ответ на задачу 7
+SELECT
+    e1.firstName,
+    e1.lastName,
+    e1.jobTitle,
+    e2.firstName AS subFirstName,
+    e2.lastName AS subLastName
+FROM
+    employees e1
+LEFT JOIN
+    employees e2 ON e1.employeeNumber = e2.reportsTo
+
